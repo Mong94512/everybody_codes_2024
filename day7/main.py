@@ -226,3 +226,5 @@ if __name__ == "__main__":
 
     ans3 = solve3()
     print(f"{ans3=}")
+
+    print("Ayoooo!")
