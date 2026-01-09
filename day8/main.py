@@ -2,30 +2,59 @@
 
 def solve1() -> int:
 
-    total_block: int = 0
+    avai_blocks: int = 0
     
     with open("input1.in") as fin:
-        total_block = int(fin.readline())
+        avai_blocks = int(fin.readline())
 
-    # print(f"{total_block=}")
-
-    block: int = 1
+    total_blocks: int = 1
     width: int = 1
 
-    while block < total_block:
+    while total_blocks < avai_blocks:
         width += 2
-        block += width
+        total_blocks += width
+
+    extra_blocks: int = total_blocks - avai_blocks
+
+    return width * extra_blocks
+
+
+def solve2() -> int:
+
+    MOD: int = 1111
+    AVAILABLE_BLOCKS: int = 20240000
+    priests: int = 0
+    thickness: list[int] = [1]
+    total_blocks: int = 0
+    final_width: int = 0
+    layer: int = 0
+
+    with open("input2.in") as fin:
+        priests = int(fin.readline())
+
+    while True:
+        width = 1 + 2 * layer
+        blocks = thickness[-1] * width
+        total_blocks += blocks
+        final_width = width
+
+        if total_blocks >= AVAILABLE_BLOCKS:
+            break
+
+        nxt = (thickness[-1] * priests) % MOD
+        thickness.append(nxt)
+        layer += 1
+        
+
+    extra_blocks: int = max(0, total_blocks - AVAILABLE_BLOCKS)
     
-
-    missing: int = block - total_block
-
-    print(f"{total_block=} {block=} {missing=} {width=}")
-
-    return width * missing
+    return extra_blocks * final_width
 
 
 if __name__ == "__main__":
-    # print("Ayooo!")
 
     ans1: int = solve1()
     print(f"{ans1=}")
+
+    ans2: int = solve2()
+    print(f"{ans2=}")
