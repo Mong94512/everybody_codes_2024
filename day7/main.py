@@ -99,7 +99,7 @@ def solve1() -> str:
 def solve2() -> str:
 
     track: str = ""
-    plans: List[List[str]] = ""
+    plans: List[List[str]] = []
 
     with open("input2.in") as fin:
         plans = parse_plans(fin)
@@ -107,24 +107,24 @@ def solve2() -> str:
 
     def calc_score(plan: List[str]) -> tuple[int, str]:
 
-        power = 10
-        ptr = 1
-        score = 0
-        
+        def update_power(power: int, t: str, p: str) -> int:
+            if t == "+":
+                return power + 1
+            if t == "-":
+                return max(0, power - 1)
+            if p == "+":
+                return power + 1
+            if p == "-":
+                return max(0, power - 1)
+            return power
+
+        power: int = 10
+        ptr: int = 1
+        score: int = 0
+
         for _ in range(10):
             for t in track:
-
-                if t == "+":
-                    power += 1
-                elif t == "-":
-                    power = max(0, power - 1)
-                else:
-                    #we are free
-                    if plan[ptr] == "+":
-                        power += 1
-                    elif plan[ptr] == "-":
-                        power = max(0, power - 1)
-                
+                power = update_power(power, t, plan[ptr])
                 score += power
                 ptr = max(1, (ptr + 1) % len(plan))
 
@@ -151,28 +151,30 @@ def solve3() -> int:
 
     def calc_score(plan: str) -> int:
 
+        def update_power(power: int, t: str, p: str) -> int:
+            if t == "+":
+                return power + 1
+            if t == "-":
+                return max(0, power - 1)
+            if p == "+":
+                return power + 1
+            if p == "-":
+                return max(0, power - 1)
+            return power
+        
         power: int = 10
         ptr: int = 1
         score: int = 0
         psc: int = 0
-        st: list[int] = []
+        st: list[tuple[int, int]] = []
         rem: int = 2024
         
         while rem > 0:
+
             sc: int = 0
 
             for t in track:
-
-                if t == "+":
-                    power += 1
-                elif t == "-":
-                    power = max(0, power - 1)
-                else:
-                    if plan[ptr] == "+":
-                        power += 1
-                    elif plan[ptr] == "-":
-                        power = max(0, power - 1)
-                
+                power = update_power(power, t, plan[ptr])
                 sc += power
                 ptr = max(1, (ptr + 1) % len(plan))
             
@@ -204,7 +206,7 @@ def solve3() -> int:
         if len(path) == 12:
             return 1 if calc_score(path) > target else 0
 
-        got = 0
+        got: int = 0
 
         for op, rem in avai.items():
             if rem:
