@@ -101,7 +101,7 @@ def solve3() -> int:
         
         que: list[vec3t] = [src]
         vis: set[vec3t] = set([src])
-        step = -1
+        step: int = -1
 
         while que:
 
