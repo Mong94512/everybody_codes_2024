@@ -2,9 +2,30 @@
 from collections import deque
 
 
+def read_mat(filename: str) -> list[str]:
+
+    with open(filename) as fin:
+        return list(map(lambda x : x.strip(), fin.readlines()))
+
+
+def get_src_dest(mat: list[str]) -> tuple[list[tuple[int, int]], tuple[int, int]]:
+    
+    srcs: list[tuple[int, int]] = []
+    dest: tuple[int, int] = (-1, -1)
+
+    for y in range(len(mat)):
+        for x in range(len(mat[0])):
+            if mat[y][x] == 'S':
+                srcs.append((y, x))
+            elif mat[y][x] == 'E':
+                dest = (y, x)
+
+    return srcs, dest
+
+
 def floyd_warshall(
         mat: list[str], 
-        src: tuple[int, int], 
+        srcs: list[tuple[int, int]], 
         dest: tuple[int, int]) -> int:
     
     INF: int = 1 << 30
@@ -25,15 +46,17 @@ def floyd_warshall(
 
     def calc_level_dist(ch: str, ch1: str) -> int:
 
-        l: int = get_level(mat[y][x])
-        l1: int = get_level(mat[y1][x1])
+        l: int = get_level(ch)
+        l1: int = get_level(ch1)
         d1: int = abs(l - l1)
         d2: int = 10 - d1
 
         return min(d1, d2) + 1
 
-    dq.append(src)
-    dp[src[0]][src[1]] = 0
+
+    for y, x in srcs:
+        dp[y][x] = 0
+        dq.append((y, x))
 
     while dq:
         y, x = dq.popleft()
@@ -57,43 +80,27 @@ def floyd_warshall(
 
 
 def solve1() -> int:
-    
-    mat: list[str] = []
 
-    with open("input1.in") as fin:
-        mat = [s.strip() for s in fin.readlines()]
+    mat = read_mat("input1.in")
+    srcs, dest = get_src_dest(mat)
 
-    src: tuple[int, int] = (-1, -1)
-    dest: tuple[int, int] = (-1, -1)
-
-    for y in range(len(mat)):
-        for x in range(len(mat[0])):
-            if mat[y][x] == 'S':
-                src = (y, x)
-            elif mat[y][x] == 'E':
-                dest = (y, x)
-
-    return floyd_warshall(mat, src, dest)
+    return floyd_warshall(mat, srcs, dest)
 
 
 def solve2() -> int:
     
-    mat: list[str] = []
+    mat = read_mat("input2.in")
+    srcs, dest = get_src_dest(mat)
 
-    with open("input2.in") as fin:
-        mat = [s.strip() for s in fin.readlines()]
+    return floyd_warshall(mat, srcs, dest)
 
-    src: tuple[int, int] = (-1, -1)
-    dest: tuple[int, int] = (-1, -1)
 
-    for y in range(len(mat)):
-        for x in range(len(mat[0])):
-            if mat[y][x] == 'S':
-                src = (y, x)
-            elif mat[y][x] == 'E':
-                dest = (y, x)
+def solve3() -> int:
+    
+    mat = read_mat("input3.in")
+    srcs, dest = get_src_dest(mat)
 
-    return floyd_warshall(mat, src, dest)
+    return floyd_warshall(mat, srcs, dest)
 
 
 if __name__ == "__main__":
@@ -104,3 +111,5 @@ if __name__ == "__main__":
     ans2: int = solve2()
     print(f"{ans2=}")
 
+    ans3: int = solve3()
+    print(f"{ans3=}")
