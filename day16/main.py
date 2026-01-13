@@ -1,6 +1,7 @@
 
 from collections import defaultdict
-from functools import reduce
+from functools import cache, reduce
+import sys
 # from typing import Counter
 
 # fout = open("sandbox.out", "w")
@@ -43,9 +44,10 @@ def solve1() -> str:
     return " ".join(ans)
 
 
-def solve2(target_pull: int) -> int:
+def solve2() -> int:
 
     wheel_mags, bytes = read_input("input2.in")
+    target_pull: int = 2_024_202_420_24
     
     vis: set[str] = set()
     path: list[tuple[str, int]] = []
@@ -92,10 +94,55 @@ def solve2(target_pull: int) -> int:
     return ans
 
 
+def solve3() -> tuple[int, int]:
+    
+    sys.setrecursionlimit(1_000_00)
+    wheel_mags, bytes = read_input("input3.in")
+    MAX_PULL: int = 256
+    INF: int = 1 << 30
+
+    def calc_score(pull: int, delta: int) -> int:
+
+        score: int = 0
+        cfreq: dict[str, int] = defaultdict(int)
+
+        for i, byte in enumerate(bytes):
+            j: int = (pull * wheel_mags[i] - delta) % len(byte)
+            b: str = byte[j]
+            cfreq[b[0]] += 1
+            cfreq[b[2]] += 1
+
+        for freq in cfreq.values():
+            score += max(0, freq - 2)
+
+        return score
+
+    @cache
+    def dfs(pull: int, delta: int) -> tuple[int, int]:
+        if pull > MAX_PULL:
+            return 0, 0
+
+        cur_best: list[int] = [-INF, INF]
+
+        for d in range(-1, 2, 1):
+            score: int = calc_score(pull, delta + d)
+            other_best: tuple[int, int] = dfs(pull + 1, delta + d)
+
+            cur_best[0] = max(cur_best[0], other_best[0] + score)
+            cur_best[1] = min(cur_best[1], other_best[1] + score)
+
+        return tuple[int, int](cur_best)
+
+    return dfs(1, 0)
+
+
 if __name__ == "__main__":
 
     ans1: str = solve1()
     print(f"{ans1=}")
 
-    ans2: int = solve2(2_024_202_420_24)
+    ans2: int = solve2()
     print(f"{ans2=}")
+
+    ans3: tuple[int, int] = solve3()
+    print(f"{ans3=}")
