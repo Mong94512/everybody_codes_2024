@@ -1,4 +1,9 @@
 
+from collections import defaultdict, deque
+# import heapq
+import itertools
+import time
+
 dirs: list[tuple[int, int]] = [(0, -1), (0, 1), (1, 0), (-1, 0)]
 
 
@@ -119,26 +124,98 @@ def solve2() -> int:
 
 def solve3() -> int:
 
-    mat: list[str] = []
+    mat: list[list[str]] = []
 
     with open("input3.in") as fin:
         while s := fin.readline().strip():
-            mat.append(s)
+            mat.append(list(s))
 
     R: int = len(mat)
     C: int = len(mat[0])
-    herbs: list[str] = []
 
-    for y in range(R):
-        for x in range(C):
-            if mat[y][x].isalpha():
-                herbs.append(mat[y][x])
+    # targets: str = "HDCBAJQPONIGZ"
+    # targets: str = "GI DCAJQPN Z"
+    #CADJQNPZ
+    # targets: str = "GI CADJQNP Z"
 
-    herbs = list(set(herbs))
+    mat[0][mat[0].index('.')] = "Z"
+
+    def bfs(targets: str) -> int:
+        
+
+        vis: set[tuple[int, ...]] = set()
+        dq: deque[tuple[int, ...]] = deque()
+        step: int = -1
+        # pars = {}
+
+        def is_valid(y: int, x: int) -> bool:
+            return (
+                0 <= y < R 
+                    and 
+                0 <= x < C 
+                    and 
+                mat[y][x] not in "#~"
+            )
 
 
+        dq.append((0, mat[0].index('Z'), 0))
+        vis.add(dq[-1])
+        # pars[dq[-1]] = dq[-1]
+        
+        while dq:
+            step += 1
+            rep: int = len(dq)
 
-    return -1
+            for _ in range(rep):
+                y, x, t = dq.popleft()
+
+                if t == len(targets):
+                    
+                    # gots = set()
+
+                    # while (y, x, t) != pars[(y, x, t)]:
+                    #     if mat[y][x].isalpha():
+                    #         gots.add(mat[y][x])
+
+                    #     mat[y][x] = '@'
+                    #     y, x, t = pars[(y, x, t)]
+
+                    # with open("sandbox.out", "w") as fout:
+                    #     print(f"{gots=} {len(gots)=}", file=fout)
+                    #     for row in mat:
+                    #         fout.write("".join(row) + "\n")
+
+                    return step
+
+                for dy, dx in dirs:
+                    y1: int = y + dy
+                    x1: int = x + dx
+                    t1: int = t
+
+                    if not is_valid(y1, x1):
+                        continue
+                    
+                    if mat[y1][x1] == targets[t1]:
+                        t1 += 1
+
+                    if (y1, x1, t1) not in vis:
+                        vis.add((y1, x1, t1))
+                        dq.append((y1, x1, t1))
+                        # pars[(y1, x1, t1)] = (y, x, t)
+
+        return -1
+
+    best: int = 1 << 30
+    # targets: str = "GI CADJQNP Z"
+    pp: list[str] = ["CA", "PN", "D", "J", "Q"]
+
+    for ss in itertools.permutations(pp):
+        targets: str = "GI" + "".join(ss) + "Z"
+        got: int = bfs(targets)
+        # print(f"{got=} {targets=}")
+        best = min(best, got)
+    
+    return best
 
 
 if __name__ == "__main__":
@@ -149,5 +226,5 @@ if __name__ == "__main__":
     ans2: int = solve2()
     print(f"{ans2=}")
     
-    # ans3: int = solve3()
-    # print(f"{ans3=}")
+    ans3: int = solve3()
+    print(f"{ans3=}")
