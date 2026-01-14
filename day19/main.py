@@ -1,6 +1,4 @@
 
-fout = open("sandbox.out", "w+")
-
 def read_input(filename: str) -> tuple[str, list[list[str]]]:
 
     rots: str = ""
@@ -102,7 +100,6 @@ def solve3() -> str:
 
             if ci == 2 and ok:
                 return "".join(maybe)
-
 
     return ""
 
