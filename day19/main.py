@@ -1,5 +1,5 @@
 
-# fout = open("sandbox.out", "w+")
+fout = open("sandbox.out", "w+")
 
 def read_input(filename: str) -> tuple[str, list[list[str]]]:
 
@@ -53,24 +53,59 @@ def solve1() -> str:
 def solve2() -> str:
 
     rots, mat = read_input("input2.in")
-    # rot_i: int = 0
 
     for _ in range(100):
         apply_rotation(mat, rots)
-        # fout.seek(0)
-        # fout.truncate()
-        # for row in mat:
-        #     print("".join(row), file=fout)
-
-        # print(file=fout)
-
-    # return "-1-1-1"
 
     for row in mat:
         if "<" in row:
             return "".join(row[row.index(">") + 1 : row.index("<")])
         
     return ""
+
+
+def solve3() -> str:
+
+    rots, mat = read_input("input3.in")
+    
+    for rep in range(1 << 100):
+        apply_rotation(mat, rots)
+
+        if rep % 3:
+            continue
+
+        for row in mat:
+            if ">" not in row or "<" not in row:
+                continue
+
+            begin_x: int = row.index(">")
+            end_x: int = row.index("<")
+            size: int = end_x - begin_x - 1
+
+            if size <= 0 or size > 23:
+                continue
+
+            maybe: list[str] = row[begin_x + 1 : end_x]
+            cover: str = "28"
+            ci: int = 0
+            ok: bool = True
+
+            for i, ch in enumerate(maybe):
+                if ch.isdigit():
+                    continue
+
+                if ci == len(cover):
+                    ok = False
+                    break
+                maybe[i] = cover[ci]
+                ci += 1
+
+            if ci == 2 and ok:
+                return "".join(maybe)
+
+
+    return ""
+
 
 if __name__ == "__main__":
 
@@ -79,3 +114,6 @@ if __name__ == "__main__":
     
     ans2: str = solve2()
     print(f"{ans2=}")
+    
+    ans3: str = solve3()
+    print(f"{ans3=}")
